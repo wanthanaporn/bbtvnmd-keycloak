@@ -1,0 +1,90 @@
+{
+  "family": "keycloak-task",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::461815325316:role/keycloak-task-execution-role",
+  "taskRoleArn": "arn:aws:iam::461815325316:role/keycloak-task-role",
+  "containerDefinitions": [
+    {
+      "name": "keycloak",
+      "image": "461815325316.dkr.ecr.ap-southeast-1.amazonaws.com/bbtvnmd-keycloak:latest",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "KC_DB",
+          "value": "postgres"
+        },
+        {
+          "name": "KC_HEALTH_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "KC_METRICS_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "KC_PROXY",
+          "value": "edge"
+        },
+        {
+          "name": "KC_HOSTNAME",
+          "value": "auth-kc.bbtvnewmedia.com"
+        },
+        {
+          "name": "KC_HOSTNAME_STRICT",
+          "value": "false"
+        },
+        {
+          "name": "KC_HTTP_ENABLED",
+          "value": "true"
+        },
+        {
+          "name": "KC_HOSTNAME_STRICT_HTTPS",
+          "value": "false"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "KC_DB_URL_HOST",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:461815325316:secret:prod/keycloak/db-credentials-Z3x882:host::"
+        },
+        {
+          "name": "KC_DB_URL_DATABASE",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:461815325316:secret:prod/keycloak/db-credentials-Z3x882:dbname::"
+        },
+        {
+          "name": "KC_DB_USERNAME",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:461815325316:secret:prod/keycloak/db-credentials-Z3x882:username::"
+        },
+        {
+          "name": "KC_DB_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:461815325316:secret:prod/keycloak/db-credentials-Z3x882:password::"
+        },
+        {
+          "name": "KEYCLOAK_ADMIN",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:461815325316:secret:prod/keycloak/admin-credentials-GM6sKc:username::"
+        },
+        {
+          "name": "KEYCLOAK_ADMIN_PASSWORD",
+          "valueFrom": "arn:aws:secretsmanager:ap-southeast-1:461815325316:secret:prod/keycloak/admin-credentials-GM6sKc:password::"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/prod-keycloak-taskdifinition",
+          "awslogs-region": "ap-southeast-1",
+          "awslogs-stream-prefix": "keycloak"
+        }
+      }
+    }
+  ]
+}
